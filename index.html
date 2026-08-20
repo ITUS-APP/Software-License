@@ -11,11 +11,15 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .view {
-            display: none
+            display: none !important;
         }
 
         .view.active {
-            display: block
+            display: block !important;
+        }
+
+        #loginView.active {
+            display: grid !important;
         }
 
         .tabulator {
@@ -118,9 +122,57 @@
             } catch (err) { fail(err) }
         });
 
-        async function restore() { if (!state.token) return; try { const r = await api('getProfile'); state.user = r.user; startApp() } catch { localStorage.removeItem('slm_token') } }
-        function startApp() { loginView.classList.remove('active'); appView.classList.add('active'); profile.textContent = `${state.user.username} (${state.user.role})`; document.querySelectorAll('.admin-only').forEach(x => x.classList.toggle('hidden', state.user.role !== 'Admin')); showPage('dashboard') }
-        async function logout() { try { await api('logout') } catch { } state.token = ''; state.user = null; localStorage.removeItem('slm_token'); location.reload() }
+        async function restore() {
+            if (!state.token) return;
+
+            try {
+                const r = await api('getProfile');
+                state.user = r.user;
+                startApp();
+            } catch (error) {
+                state.token = '';
+                state.user = null;
+                localStorage.removeItem('slm_token');
+                showLogin();
+            }
+        }
+
+        function startApp() {
+            loginView.classList.remove('active');
+            loginView.setAttribute('aria-hidden', 'true');
+            appView.classList.add('active');
+            appView.setAttribute('aria-hidden', 'false');
+
+            profile.textContent = `${state.user.username} (${state.user.role})`;
+            document.querySelectorAll('.admin-only').forEach(element => {
+                element.classList.toggle('hidden', state.user.role !== 'Admin');
+            });
+
+            showPage('dashboard');
+        }
+
+        function showLogin() {
+            appView.classList.remove('active');
+            appView.setAttribute('aria-hidden', 'true');
+            loginView.classList.add('active');
+            loginView.setAttribute('aria-hidden', 'false');
+            loginPass.value = '';
+            loginUser.focus();
+        }
+
+        async function logout() {
+            try {
+                await api('logout');
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+
+            state.token = '';
+            state.user = null;
+            state.licenses = [];
+            localStorage.removeItem('slm_token');
+            showLogin();
+        }
 
         document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => showPage(b.dataset.page));
         async function showPage(name) {

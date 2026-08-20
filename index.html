@@ -1,14 +1,22 @@
 <!doctype html>
 <html lang="th">
-
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Software License System</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://unpkg.com/tabulator-tables@6.2.5/dist/css/tabulator.min.css" rel="stylesheet">
+
+    <link
+        href="https://unpkg.com/tabulator-tables@6.2.5/dist/css/tabulator.min.css"
+        rel="stylesheet">
+
     <script src="https://unpkg.com/tabulator-tables@6.2.5/dist/js/tabulator.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Export Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
     <style>
         .view {
             display: none !important;
@@ -24,192 +32,1570 @@
 
         .tabulator {
             border: 0;
-            border-radius: .75rem
+            border-radius: 0.75rem;
         }
 
         .nav-active {
             background: #2563eb;
-            color: #fff
+            color: #ffffff;
         }
     </style>
 </head>
 
 <body class="bg-slate-100 text-slate-800">
-    <section id="loginView"
+
+    <!-- Login -->
+    <section
+        id="loginView"
         class="view active min-h-screen grid place-items-center p-4 bg-gradient-to-br from-slate-950 to-blue-900">
-        <form id="loginForm" class="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl">
+
+        <form
+            id="loginForm"
+            class="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl">
+
             <div class="mb-7">
-                <h1 class="text-2xl font-bold">Software License System</h1>
-                <p class="text-slate-500">ระบบจัดการ Software License</p>
+                <h1 class="text-2xl font-bold">
+                    Software License System
+                </h1>
+
+                <p class="text-slate-500">
+                    ระบบจัดการ Software License
+                </p>
             </div>
-            <label class="block mb-4"><span class="text-sm font-medium">Username</span><input id="loginUser"
-                    autocomplete="username" required class="mt-1 w-full rounded-lg border p-3" value="admin"></label>
-            <label class="block mb-6"><span class="text-sm font-medium">Password</span><input id="loginPass"
-                    type="password" autocomplete="current-password" required class="mt-1 w-full rounded-lg border p-3"
-                    placeholder="••••••••"></label>
+
+            <label class="mb-4 block">
+                <span class="text-sm font-medium">
+                    Username
+                </span>
+
+                <input
+                    id="loginUser"
+                    type="text"
+                    autocomplete="username"
+                    required
+                    value="admin"
+                    class="mt-1 w-full rounded-lg border p-3">
+            </label>
+
+            <label class="mb-6 block">
+                <span class="text-sm font-medium">
+                    Password
+                </span>
+
+                <input
+                    id="loginPass"
+                    type="password"
+                    autocomplete="current-password"
+                    required
+                    placeholder="••••••••"
+                    class="mt-1 w-full rounded-lg border p-3">
+            </label>
+
             <button
-                class="w-full rounded-lg bg-blue-600 p-3 font-bold text-white hover:bg-blue-700">เข้าสู่ระบบ</button>
+                type="submit"
+                class="w-full rounded-lg bg-blue-600 p-3 font-bold text-white hover:bg-blue-700">
+                เข้าสู่ระบบ
+            </button>
         </form>
     </section>
 
+    <!-- Main Application -->
     <section id="appView" class="view min-h-screen">
+
         <header class="sticky top-0 z-20 bg-slate-950 text-white shadow">
             <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
+
                 <div>
-                    <div class="font-bold">SLM System</div>
-                    <div id="profile" class="text-xs text-slate-300"></div>
+                    <div class="font-bold">
+                        SLM System
+                    </div>
+
+                    <div
+                        id="profile"
+                        class="text-xs text-slate-300">
+                    </div>
                 </div>
-                <div class="flex gap-2"><button onclick="openPassword()"
-                        class="rounded-lg bg-slate-700 px-3 py-2 text-sm">เปลี่ยนรหัสผ่าน</button><button
-                        onclick="logout()" class="rounded-lg bg-red-600 px-3 py-2 text-sm">ออกจากระบบ</button></div>
+
+                <div class="flex gap-2">
+                    <button
+                        type="button"
+                        onclick="openPassword()"
+                        class="rounded-lg bg-slate-700 px-3 py-2 text-sm hover:bg-slate-600">
+                        เปลี่ยนรหัสผ่าน
+                    </button>
+
+                    <button
+                        type="button"
+                        onclick="logout()"
+                        class="rounded-lg bg-red-600 px-3 py-2 text-sm hover:bg-red-700">
+                        ออกจากระบบ
+                    </button>
+                </div>
+
             </div>
         </header>
+
         <div class="mx-auto max-w-7xl p-4">
+
+            <!-- Navigation -->
             <nav class="mb-5 flex gap-2 overflow-auto rounded-xl bg-white p-2 shadow-sm">
-                <button data-page="dashboard" class="nav-btn nav-active rounded-lg px-4 py-2">Dashboard</button>
-                <button data-page="licenses" class="nav-btn rounded-lg px-4 py-2">Licenses</button>
-                <button data-page="users" class="nav-btn admin-only rounded-lg px-4 py-2">Users</button>
-                <button data-page="audit" class="nav-btn admin-only rounded-lg px-4 py-2">Audit Log</button>
+
+                <button
+                    data-page="dashboard"
+                    class="nav-btn nav-active rounded-lg px-4 py-2">
+                    Dashboard
+                </button>
+
+                <button
+                    data-page="licenses"
+                    class="nav-btn rounded-lg px-4 py-2">
+                    Licenses
+                </button>
+
+                <button
+                    data-page="users"
+                    class="nav-btn admin-only rounded-lg px-4 py-2">
+                    Users
+                </button>
+
+                <button
+                    data-page="audit"
+                    class="nav-btn admin-only rounded-lg px-4 py-2">
+                    Audit Log
+                </button>
+
             </nav>
+
             <main>
+
+                <!-- Dashboard -->
                 <section id="dashboardPage" class="page">
-                    <div id="stats" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
-                </section>
-                <section id="licensesPage" class="page hidden">
                     <div
-                        class="mb-4 flex flex-col gap-3 rounded-xl bg-white p-4 shadow-sm sm:flex-row sm:justify-between">
-                        <input id="search" class="rounded-lg border px-4 py-2 sm:w-96"
-                            placeholder="ค้นหาซอฟต์แวร์, Key หรือ Vendor">
-                        <button onclick="openLicense()"
-                            class="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white">+ เพิ่ม License</button>
+                        id="stats"
+                        class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     </div>
+                </section>
+
+                <!-- Licenses -->
+                <section id="licensesPage" class="page hidden">
+
+                    <div class="mb-4 flex flex-col gap-3 rounded-xl bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+
+                        <input
+                            id="search"
+                            type="text"
+                            placeholder="ค้นหาซอฟต์แวร์, Key หรือ Vendor"
+                            class="rounded-lg border px-4 py-2 sm:w-96">
+
+                        <div class="flex flex-col gap-2 sm:flex-row">
+
+                            <button
+                                type="button"
+                                onclick="exportLicensesExcel()"
+                                class="rounded-lg bg-emerald-600 px-4 py-2 font-medium text-white hover:bg-emerald-700">
+                                Export Excel
+                            </button>
+
+                            <button
+                                type="button"
+                                onclick="openLicense()"
+                                class="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700">
+                                + เพิ่ม License
+                            </button>
+
+                        </div>
+                    </div>
+
                     <div class="rounded-xl bg-white p-3 shadow-sm">
                         <div id="licenseTable"></div>
                     </div>
+
                 </section>
+
+                <!-- Users -->
                 <section id="usersPage" class="page hidden">
-                    <div class="mb-4 flex justify-end"><button onclick="openUser()"
-                            class="rounded-lg bg-blue-600 px-4 py-2 text-white">+ เพิ่มผู้ใช้</button></div>
-                    <div class="rounded-xl bg-white p-3">
+
+                    <div class="mb-4 flex justify-end">
+                        <button
+                            type="button"
+                            onclick="openUser()"
+                            class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+                            + เพิ่มผู้ใช้
+                        </button>
+                    </div>
+
+                    <div class="rounded-xl bg-white p-3 shadow-sm">
                         <div id="userTable"></div>
                     </div>
+
                 </section>
+
+                <!-- Audit Log -->
                 <section id="auditPage" class="page hidden">
-                    <div class="rounded-xl bg-white p-3">
+
+                    <div class="rounded-xl bg-white p-3 shadow-sm">
                         <div id="auditTable"></div>
                     </div>
+
                 </section>
+
             </main>
         </div>
     </section>
 
     <script>
-        const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbxNWQRf0b_fk19K9sg37zOV-4_SvGMbEv0jfPyMGWc7leNw9li8CqVIPUhbpGuKfyxn/exec';
-        const state = { token: localStorage.getItem('slm_token') || '', user: null, licenses: [], tables: {} };
+        const GAS_API_URL =
+            'https://script.google.com/macros/s/AKfycbxNWQRf0b_fk19K9sg37zOV-4_SvGMbEv0jfPyMGWc7leNw9li8CqVIPUhbpGuKfyxn/exec';
 
+        const state = {
+            token: localStorage.getItem('slm_token') || '',
+            user: null,
+            licenses: [],
+            tables: {}
+        };
+
+        /*
+         * API
+         */
         async function api(action, payload = {}) {
-            if (GAS_API_URL.startsWith('PUT_')) throw new Error('กรุณาตั้งค่า GAS_API_URL ใน index.html');
-            const response = await fetch(GAS_API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action, payload, token: state.token }), redirect: 'follow' });
-            const text = await response.text(); let result;
-            try { result = JSON.parse(text) } catch { throw new Error('Server ไม่ได้ส่ง JSON กลับมา') }
-            if (!result.success) { if (/เข้าสู่ระบบ|Session/.test(result.message)) { state.token = ''; localStorage.removeItem('slm_token') } throw new Error(result.message) }
+            if (GAS_API_URL.startsWith('PUT_')) {
+                throw new Error(
+                    'กรุณาตั้งค่า GAS_API_URL ใน index.html'
+                );
+            }
+
+            const response = await fetch(GAS_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8'
+                },
+                body: JSON.stringify({
+                    action,
+                    payload,
+                    token: state.token
+                }),
+                redirect: 'follow'
+            });
+
+            const responseText = await response.text();
+
+            let result;
+
+            try {
+                result = JSON.parse(responseText);
+            } catch (error) {
+                throw new Error(
+                    'Server ไม่ได้ส่งข้อมูล JSON กลับมา'
+                );
+            }
+
+            if (!result.success) {
+                if (
+                    /เข้าสู่ระบบ|Session/.test(
+                        result.message || ''
+                    )
+                ) {
+                    state.token = '';
+                    localStorage.removeItem('slm_token');
+                }
+
+                throw new Error(
+                    result.message || 'เกิดข้อผิดพลาด'
+                );
+            }
+
             return result;
         }
 
-        document.getElementById('loginForm').addEventListener('submit', async e => {
-            e.preventDefault(); loading('กำลังเข้าสู่ระบบ...'); try {
-                const r = await api('login', { username: loginUser.value.trim(), password: loginPass.value }); state.token = r.token; state.user = r.user; localStorage.setItem('slm_token', r.token); Swal.close(); startApp();
-            } catch (err) { fail(err) }
-        });
+        /*
+         * Login
+         */
+        document
+            .getElementById('loginForm')
+            .addEventListener('submit', async event => {
+                event.preventDefault();
 
+                loading('กำลังเข้าสู่ระบบ...');
+
+                try {
+                    const username =
+                        document
+                            .getElementById('loginUser')
+                            .value
+                            .trim();
+
+                    const password =
+                        document
+                            .getElementById('loginPass')
+                            .value;
+
+                    const response = await api('login', {
+                        username,
+                        password
+                    });
+
+                    state.token = response.token;
+                    state.user = response.user;
+
+                    localStorage.setItem(
+                        'slm_token',
+                        response.token
+                    );
+
+                    Swal.close();
+                    startApp();
+
+                } catch (error) {
+                    fail(error);
+                }
+            });
+
+        /*
+         * Restore Session
+         */
         async function restore() {
-            if (!state.token) return;
+            if (!state.token) {
+                showLogin();
+                return;
+            }
 
             try {
-                const r = await api('getProfile');
-                state.user = r.user;
+                const response =
+                    await api('getProfile');
+
+                state.user = response.user;
+
                 startApp();
+
             } catch (error) {
                 state.token = '';
                 state.user = null;
+
                 localStorage.removeItem('slm_token');
+
                 showLogin();
             }
         }
 
+        /*
+         * Start Application
+         */
         function startApp() {
-            loginView.classList.remove('active');
-            loginView.setAttribute('aria-hidden', 'true');
-            appView.classList.add('active');
-            appView.setAttribute('aria-hidden', 'false');
+            const loginView =
+                document.getElementById('loginView');
 
-            profile.textContent = `${state.user.username} (${state.user.role})`;
-            document.querySelectorAll('.admin-only').forEach(element => {
-                element.classList.toggle('hidden', state.user.role !== 'Admin');
-            });
+            const appView =
+                document.getElementById('appView');
+
+            loginView.classList.remove('active');
+            loginView.setAttribute(
+                'aria-hidden',
+                'true'
+            );
+
+            appView.classList.add('active');
+            appView.setAttribute(
+                'aria-hidden',
+                'false'
+            );
+
+            document.getElementById('profile').textContent =
+                `${state.user.username} (${state.user.role})`;
+
+            document
+                .querySelectorAll('.admin-only')
+                .forEach(element => {
+                    element.classList.toggle(
+                        'hidden',
+                        state.user.role !== 'Admin'
+                    );
+                });
 
             showPage('dashboard');
         }
 
+        /*
+         * Show Login
+         */
         function showLogin() {
+            const loginView =
+                document.getElementById('loginView');
+
+            const appView =
+                document.getElementById('appView');
+
             appView.classList.remove('active');
-            appView.setAttribute('aria-hidden', 'true');
+            appView.setAttribute(
+                'aria-hidden',
+                'true'
+            );
+
             loginView.classList.add('active');
-            loginView.setAttribute('aria-hidden', 'false');
-            loginPass.value = '';
-            loginUser.focus();
+            loginView.setAttribute(
+                'aria-hidden',
+                'false'
+            );
+
+            document.getElementById('loginPass').value = '';
+            document.getElementById('loginUser').focus();
         }
 
+        /*
+         * Logout
+         */
         async function logout() {
             try {
                 await api('logout');
             } catch (error) {
-                console.error('Logout error:', error);
+                console.error(
+                    'Logout error:',
+                    error
+                );
             }
 
             state.token = '';
             state.user = null;
             state.licenses = [];
+
             localStorage.removeItem('slm_token');
+
             showLogin();
         }
 
-        document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => showPage(b.dataset.page));
-        async function showPage(name) {
-            document.querySelectorAll('.page').forEach(x => x.classList.add('hidden')); document.getElementById(name + 'Page').classList.remove('hidden'); document.querySelectorAll('.nav-btn').forEach(x => x.classList.toggle('nav-active', x.dataset.page === name));
-            try { if (name === 'dashboard') await loadDashboard(); if (name === 'licenses') await loadLicenses(); if (name === 'users') await loadUsers(); if (name === 'audit') await loadAudit() } catch (e) { fail(e) }
+        /*
+         * Navigation
+         */
+        document
+            .querySelectorAll('.nav-btn')
+            .forEach(button => {
+                button.addEventListener('click', () => {
+                    showPage(button.dataset.page);
+                });
+            });
+
+        async function showPage(pageName) {
+            document
+                .querySelectorAll('.page')
+                .forEach(page => {
+                    page.classList.add('hidden');
+                });
+
+            const selectedPage =
+                document.getElementById(
+                    `${pageName}Page`
+                );
+
+            if (selectedPage) {
+                selectedPage.classList.remove('hidden');
+            }
+
+            document
+                .querySelectorAll('.nav-btn')
+                .forEach(button => {
+                    button.classList.toggle(
+                        'nav-active',
+                        button.dataset.page === pageName
+                    );
+                });
+
+            try {
+                if (pageName === 'dashboard') {
+                    await loadDashboard();
+                }
+
+                if (pageName === 'licenses') {
+                    await loadLicenses();
+                }
+
+                if (pageName === 'users') {
+                    await loadUsers();
+                }
+
+                if (pageName === 'audit') {
+                    await loadAudit();
+                }
+
+            } catch (error) {
+                fail(error);
+            }
         }
 
-        async function loadDashboard() { const d = (await api('getDashboard')).data; const cards = [['License ทั้งหมด', d.total, 'blue'], ['ใช้งานอยู่', d.active, 'green'], ['ใกล้หมดอายุ ≤30 วัน', d.expiring, 'amber'], ['หมดอายุแล้ว', d.expired, 'red'], ['Seats ที่ซื้อ', d.totalSeats, 'violet'], ['Seats ที่ใช้', d.usedSeats, 'cyan']]; stats.innerHTML = cards.map(c => `<div class="rounded-xl bg-white p-5 shadow-sm border-l-4 border-${c[2]}-500"><div class="text-sm text-slate-500">${c[0]}</div><div class="mt-2 text-3xl font-bold">${c[1]}</div></div>`).join('') }
+        /*
+         * Dashboard
+         */
+        async function loadDashboard() {
+            const response =
+                await api('getDashboard');
+
+            const data = response.data;
+
+            const cards = [
+                {
+                    title: 'License ทั้งหมด',
+                    value: data.total,
+                    color: 'border-blue-500'
+                },
+                {
+                    title: 'ใช้งานอยู่',
+                    value: data.active,
+                    color: 'border-green-500'
+                },
+                {
+                    title: 'ใกล้หมดอายุ ≤30 วัน',
+                    value: data.expiring,
+                    color: 'border-amber-500'
+                },
+                {
+                    title: 'หมดอายุแล้ว',
+                    value: data.expired,
+                    color: 'border-red-500'
+                },
+                {
+                    title: 'Seats ที่ซื้อ',
+                    value: data.totalSeats,
+                    color: 'border-violet-500'
+                },
+                {
+                    title: 'Seats ที่ใช้',
+                    value: data.usedSeats,
+                    color: 'border-cyan-500'
+                }
+            ];
+
+            document.getElementById('stats').innerHTML =
+                cards.map(card => `
+                    <div class="rounded-xl border-l-4 ${card.color} bg-white p-5 shadow-sm">
+                        <div class="text-sm text-slate-500">
+                            ${card.title}
+                        </div>
+
+                        <div class="mt-2 text-3xl font-bold">
+                            ${card.value}
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        /*
+         * Load Licenses
+         */
         async function loadLicenses() {
-            const r = await api('getLicenses', { search: search.value }); state.licenses = r.data; const cols = [{ title: 'Software', field: 'software', minWidth: 170 }, { title: 'License Key', field: 'key', minWidth: 180 }, { title: 'Vendor', field: 'vendor' }, { title: 'Expiry', field: 'expiry' }, { title: 'Seats', formatter: c => `${c.getRow().getData().used}/${c.getRow().getData().total}` }, { title: 'Status', field: 'status' }, { title: '', width: 150, formatter: c => `<button class="edit text-blue-600 mr-3">แก้ไข</button>${state.user.role === 'Admin' ? '<button class="del text-red-600">ลบ</button>' : ''}`, cellClick: (e, c) => { if (e.target.classList.contains('edit')) openLicense(c.getRow().getData()); if (e.target.classList.contains('del')) deleteLicense(c.getRow().getData()) } }];
-            if (state.tables.licenses) state.tables.licenses.replaceData(r.data); else state.tables.licenses = new Tabulator('#licenseTable', { data: r.data, layout: 'fitColumns', responsiveLayout: 'collapse', pagination: true, paginationSize: 10, columns: cols })
+            const searchValue =
+                document
+                    .getElementById('search')
+                    .value
+                    .trim();
+
+            const response =
+                await api('getLicenses', {
+                    search: searchValue
+                });
+
+            state.licenses = response.data || [];
+
+            const columns = [
+                {
+                    title: 'Software',
+                    field: 'software',
+                    minWidth: 170
+                },
+                {
+                    title: 'License Key',
+                    field: 'key',
+                    minWidth: 180
+                },
+                {
+                    title: 'Vendor',
+                    field: 'vendor',
+                    minWidth: 140
+                },
+                {
+                    title: 'Expiry',
+                    field: 'expiry',
+                    minWidth: 120
+                },
+                {
+                    title: 'Seats',
+                    minWidth: 100,
+                    formatter: cell => {
+                        const row =
+                            cell.getRow().getData();
+
+                        return `${row.used}/${row.total}`;
+                    }
+                },
+                {
+                    title: 'Status',
+                    field: 'status',
+                    minWidth: 100
+                },
+                {
+                    title: '',
+                    width: 150,
+                    headerSort: false,
+                    formatter: cell => {
+                        const deleteButton =
+                            state.user.role === 'Admin'
+                                ? `<button class="delete-license ml-3 text-red-600 hover:underline">ลบ</button>`
+                                : '';
+
+                        return `
+                            <button class="edit-license text-blue-600 hover:underline">
+                                แก้ไข
+                            </button>
+                            ${deleteButton}
+                        `;
+                    },
+                    cellClick: (event, cell) => {
+                        const rowData =
+                            cell.getRow().getData();
+
+                        if (
+                            event.target.classList.contains(
+                                'edit-license'
+                            )
+                        ) {
+                            openLicense(rowData);
+                        }
+
+                        if (
+                            event.target.classList.contains(
+                                'delete-license'
+                            )
+                        ) {
+                            deleteLicense(rowData);
+                        }
+                    }
+                }
+            ];
+
+            if (state.tables.licenses) {
+                state.tables.licenses.replaceData(
+                    state.licenses
+                );
+
+                return;
+            }
+
+            state.tables.licenses =
+                new Tabulator('#licenseTable', {
+                    data: state.licenses,
+                    layout: 'fitColumns',
+                    responsiveLayout: 'collapse',
+                    pagination: true,
+                    paginationSize: 10,
+                    placeholder: 'ไม่พบข้อมูล License',
+                    columns
+                });
         }
-        let searchTimer; search.addEventListener('input', () => { clearTimeout(searchTimer); searchTimer = setTimeout(loadLicenses, 300) });
 
-        async function openLicense(x = {}) {
-            const { value } = await Swal.fire({
-                title: x.id ? 'แก้ไข License' : 'เพิ่ม License', width: 700, html: formHtml([
-                    ['software', 'ชื่อ Software', x.software, true], ['key', 'License Key', x.key, true], ['vendor', 'Vendor', x.vendor, true], ['expiry', 'วันหมดอายุ', x.expiry, false, 'date'], ['total', 'จำนวน Seats ทั้งหมด', x.total ?? 0, true, 'number'], ['used', 'จำนวน Seats ที่ใช้', x.used ?? 0, true, 'number'], ['status', 'สถานะ', x.status || 'Active', true, 'select'], ['note', 'หมายเหตุ', x.note || '', false]
-                ]), showCancelButton: true, confirmButtonText: 'บันทึก', cancelButtonText: 'ยกเลิก', preConfirm: () => collect(['software', 'key', 'vendor', 'expiry', 'total', 'used', 'status', 'note'])
-            }); if (!value) return; try { loading(); await api('saveLicense', { id: x.id, ...value, total: Number(value.total), used: Number(value.used) }); await loadLicenses(); await loadDashboard(); ok('บันทึกสำเร็จ') } catch (e) { fail(e) }
+        /*
+         * Search License
+         */
+        let searchTimer;
+
+        document
+            .getElementById('search')
+            .addEventListener('input', () => {
+                clearTimeout(searchTimer);
+
+                searchTimer = setTimeout(() => {
+                    loadLicenses().catch(fail);
+                }, 300);
+            });
+
+        /*
+         * Export Excel
+         */
+        async function exportLicensesExcel() {
+            try {
+                if (typeof XLSX === 'undefined') {
+                    throw new Error(
+                        'ไม่สามารถโหลดเครื่องมือสร้างไฟล์ Excel ได้'
+                    );
+                }
+
+                loading('กำลังสร้างไฟล์ Excel...');
+
+                const searchValue =
+                    document
+                        .getElementById('search')
+                        .value
+                        .trim();
+
+                const response =
+                    await api('getLicenses', {
+                        search: searchValue
+                    });
+
+                const licenses =
+                    response.data || [];
+
+                if (licenses.length === 0) {
+                    return Swal.fire(
+                        'ไม่มีข้อมูล',
+                        'ไม่พบข้อมูล License สำหรับส่งออก',
+                        'info'
+                    );
+                }
+
+                const rows =
+                    licenses.map((license, index) => {
+                        const totalSeats =
+                            Number(license.total) || 0;
+
+                        const usedSeats =
+                            Number(license.used) || 0;
+
+                        return {
+                            'No.': index + 1,
+                            'Software':
+                                license.software || '',
+                            'License Key':
+                                license.key || '',
+                            'Vendor':
+                                license.vendor || '',
+                            'Expiry Date':
+                                license.expiry
+                                    ? parseExcelDate(
+                                        license.expiry
+                                    )
+                                    : '',
+                            'Total Seats':
+                                totalSeats,
+                            'Used Seats':
+                                usedSeats,
+                            'Available Seats':
+                                Math.max(
+                                    totalSeats - usedSeats,
+                                    0
+                                ),
+                            'Status':
+                                license.status || '',
+                            'Note':
+                                license.note || ''
+                        };
+                    });
+
+                const totalSeats =
+                    rows.reduce(
+                        (sum, row) =>
+                            sum + row['Total Seats'],
+                        0
+                    );
+
+                const usedSeats =
+                    rows.reduce(
+                        (sum, row) =>
+                            sum + row['Used Seats'],
+                        0
+                    );
+
+                const summaryRows = [
+                    [
+                        'Software License System',
+                        ''
+                    ],
+                    [
+                        'Exported At',
+                        new Date()
+                    ],
+                    [
+                        'Exported By',
+                        state.user
+                            ? `${state.user.username} (${state.user.role})`
+                            : ''
+                    ],
+                    [
+                        'Search Filter',
+                        searchValue || 'All records'
+                    ],
+                    [
+                        'Total Licenses',
+                        rows.length
+                    ],
+                    [
+                        'Total Seats',
+                        totalSeats
+                    ],
+                    [
+                        'Used Seats',
+                        usedSeats
+                    ],
+                    [
+                        'Available Seats',
+                        Math.max(
+                            totalSeats - usedSeats,
+                            0
+                        )
+                    ]
+                ];
+
+                const workbook =
+                    XLSX.utils.book_new();
+
+                const summarySheet =
+                    XLSX.utils.aoa_to_sheet(
+                        summaryRows,
+                        {
+                            cellDates: true
+                        }
+                    );
+
+                const licenseSheet =
+                    XLSX.utils.json_to_sheet(
+                        rows,
+                        {
+                            cellDates: true
+                        }
+                    );
+
+                summarySheet['!cols'] = [
+                    { wch: 22 },
+                    { wch: 30 }
+                ];
+
+                licenseSheet['!cols'] = [
+                    { wch: 7 },
+                    { wch: 30 },
+                    { wch: 28 },
+                    { wch: 20 },
+                    { wch: 14 },
+                    { wch: 13 },
+                    { wch: 12 },
+                    { wch: 16 },
+                    { wch: 12 },
+                    { wch: 32 }
+                ];
+
+                if (licenseSheet['!ref']) {
+                    licenseSheet['!autofilter'] = {
+                        ref: licenseSheet['!ref']
+                    };
+                }
+
+                if (summarySheet.B2) {
+                    summarySheet.B2.z =
+                        'yyyy-mm-dd hh:mm';
+                }
+
+                for (
+                    let rowNumber = 2;
+                    rowNumber <= rows.length + 1;
+                    rowNumber++
+                ) {
+                    const expiryCell =
+                        licenseSheet[
+                            `E${rowNumber}`
+                        ];
+
+                    if (
+                        expiryCell &&
+                        expiryCell.v instanceof Date
+                    ) {
+                        expiryCell.z =
+                            'yyyy-mm-dd';
+                    }
+                }
+
+                XLSX.utils.book_append_sheet(
+                    workbook,
+                    summarySheet,
+                    'Summary'
+                );
+
+                XLSX.utils.book_append_sheet(
+                    workbook,
+                    licenseSheet,
+                    'Licenses'
+                );
+
+                const now = new Date();
+
+                const fileDate = [
+                    now.getFullYear(),
+                    String(
+                        now.getMonth() + 1
+                    ).padStart(2, '0'),
+                    String(
+                        now.getDate()
+                    ).padStart(2, '0')
+                ].join('');
+
+                XLSX.writeFile(
+                    workbook,
+                    `Software_Licenses_${fileDate}.xlsx`,
+                    {
+                        compression: true,
+                        cellDates: true
+                    }
+                );
+
+                Swal.fire(
+                    'สำเร็จ',
+                    `ส่งออก ${rows.length} รายการเป็น Excel แล้ว`,
+                    'success'
+                );
+
+            } catch (error) {
+                fail(error);
+            }
         }
-        async function deleteLicense(x) { const r = await Swal.fire({ title: 'ยืนยันการลบ?', text: x.software, icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc2626' }); if (!r.isConfirmed) return; try { await api('deleteLicense', { id: x.id }); await loadLicenses(); ok('ลบสำเร็จ') } catch (e) { fail(e) } }
 
-        async function loadUsers() { const data = (await api('getUsers')).data; const cols = [{ title: 'Username', field: 'username' }, { title: 'Role', field: 'role' }, { title: 'Active', field: 'active', formatter: c => c.getValue() ? 'ใช้งาน' : 'ปิด' }, { title: '', formatter: () => '<button class="edit text-blue-600 mr-3">แก้ไข</button><button class="del text-red-600">ลบ</button>', cellClick: (e, c) => { if (e.target.classList.contains('edit')) openUser(c.getRow().getData()); if (e.target.classList.contains('del')) deleteUser(c.getRow().getData()) } }]; if (state.tables.users) state.tables.users.replaceData(data); else state.tables.users = new Tabulator('#userTable', { data, layout: 'fitColumns', responsiveLayout: 'collapse', columns: cols }) }
-        async function openUser(x = {}) { const { value } = await Swal.fire({ title: x.id ? 'แก้ไขผู้ใช้' : 'เพิ่มผู้ใช้', html: formHtml([['username', 'Username', x.username, true], ['password', x.id ? 'Password ใหม่ (เว้นว่างหากไม่เปลี่ยน)' : 'Password อย่างน้อย 8 ตัว', '', !x.id, 'password'], ['role', 'Role', x.role || 'User', true, 'role'], ['active', 'เปิดใช้งาน', x.active !== false, true, 'checkbox']]), showCancelButton: true, preConfirm: () => collect(['username', 'password', 'role', 'active']) }); if (!value) return; try { await api('saveUser', { id: x.id, ...value, active: document.getElementById('f_active').checked }); await loadUsers(); ok('บันทึกสำเร็จ') } catch (e) { fail(e) } }
-        async function deleteUser(x) { const r = await Swal.fire({ title: 'ลบผู้ใช้นี้?', text: x.username, icon: 'warning', showCancelButton: true }); if (!r.isConfirmed) return; try { await api('deleteUser', { id: x.id }); await loadUsers(); ok('ลบสำเร็จ') } catch (e) { fail(e) } }
-        async function loadAudit() { const data = (await api('getAuditLog', { limit: 200 })).data; const cols = [{ title: 'เวลา', field: 'timestamp', minWidth: 180 }, { title: 'ผู้ใช้', field: 'username' }, { title: 'Action', field: 'action' }, { title: 'Entity', field: 'entity' }, { title: 'ID', field: 'entityId' }, { title: 'รายละเอียด', field: 'detail', minWidth: 200 }]; if (state.tables.audit) state.tables.audit.replaceData(data); else state.tables.audit = new Tabulator('#auditTable', { data, layout: 'fitColumns', responsiveLayout: 'collapse', pagination: true, paginationSize: 20, columns: cols }) }
-        async function openPassword() { const { value } = await Swal.fire({ title: 'เปลี่ยนรหัสผ่าน', html: formHtml([['oldPassword', 'รหัสผ่านเดิม', '', true, 'password'], ['newPassword', 'รหัสผ่านใหม่อย่างน้อย 8 ตัว', '', true, 'password']]), showCancelButton: true, preConfirm: () => collect(['oldPassword', 'newPassword']) }); if (!value) return; try { await api('changePassword', value); ok('เปลี่ยนรหัสผ่านสำเร็จ') } catch (e) { fail(e) } }
+        function parseExcelDate(value) {
+            const parts =
+                String(value)
+                    .split('-')
+                    .map(Number);
 
-        function formHtml(fields) { return `<div class="text-left space-y-3">${fields.map(([id, label, value, req, type = 'text']) => { if (type === 'select') return `<label class="block"><span>${label}</span><select id="f_${id}" class="mt-1 w-full rounded border p-2"><option ${value === 'Active' ? 'selected' : ''}>Active</option><option ${value === 'Inactive' ? 'selected' : ''}>Inactive</option></select></label>`; if (type === 'role') return `<label class="block"><span>${label}</span><select id="f_${id}" class="mt-1 w-full rounded border p-2"><option ${value === 'User' ? 'selected' : ''}>User</option><option ${value === 'Admin' ? 'selected' : ''}>Admin</option></select></label>`; if (type === 'checkbox') return `<label class="flex gap-2"><input id="f_${id}" type="checkbox" ${value ? 'checked' : ''}>${label}</label>`; return `<label class="block"><span>${label}</span><input id="f_${id}" type="${type}" value="${esc(value ?? '')}" ${req ? 'required' : ''} class="mt-1 w-full rounded border p-2"></label>` }).join('')}</div>` }
-        function collect(ids) { const o = {}; for (const id of ids) { const el = document.getElementById('f_' + id); if (!el) continue; o[id] = el.type === 'checkbox' ? el.checked : el.value.trim(); if (el.required && !o[id]) { Swal.showValidationMessage('กรุณากรอกข้อมูลให้ครบ'); return false } } return o }
-        function esc(v) { return String(v).replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m])) }
-        function loading(t = 'กำลังดำเนินการ...') { Swal.fire({ title: t, allowOutsideClick: false, didOpen: () => Swal.showLoading() }) } function ok(t) { Swal.fire('สำเร็จ', t, 'success') } function fail(e) { console.error(e); Swal.fire('ข้อผิดพลาด', e.message || String(e), 'error') }
+            if (
+                parts.length !== 3 ||
+                parts.some(Number.isNaN)
+            ) {
+                return value;
+            }
+
+            return new Date(
+                parts[0],
+                parts[1] - 1,
+                parts[2]
+            );
+        }
+
+        /*
+         * Add/Edit License
+         */
+        async function openLicense(license = {}) {
+            const result = await Swal.fire({
+                title: license.id
+                    ? 'แก้ไข License'
+                    : 'เพิ่ม License',
+
+                width: 700,
+
+                html: formHtml([
+                    [
+                        'software',
+                        'ชื่อ Software',
+                        license.software,
+                        true
+                    ],
+                    [
+                        'key',
+                        'License Key',
+                        license.key,
+                        true
+                    ],
+                    [
+                        'vendor',
+                        'Vendor',
+                        license.vendor,
+                        true
+                    ],
+                    [
+                        'expiry',
+                        'วันหมดอายุ',
+                        license.expiry,
+                        false,
+                        'date'
+                    ],
+                    [
+                        'total',
+                        'จำนวน Seats ทั้งหมด',
+                        license.total ?? 0,
+                        true,
+                        'number'
+                    ],
+                    [
+                        'used',
+                        'จำนวน Seats ที่ใช้',
+                        license.used ?? 0,
+                        true,
+                        'number'
+                    ],
+                    [
+                        'status',
+                        'สถานะ',
+                        license.status || 'Active',
+                        true,
+                        'status'
+                    ],
+                    [
+                        'note',
+                        'หมายเหตุ',
+                        license.note || '',
+                        false
+                    ]
+                ]),
+
+                showCancelButton: true,
+                confirmButtonText: 'บันทึก',
+                cancelButtonText: 'ยกเลิก',
+
+                preConfirm: () => collect([
+                    'software',
+                    'key',
+                    'vendor',
+                    'expiry',
+                    'total',
+                    'used',
+                    'status',
+                    'note'
+                ])
+            });
+
+            if (!result.value) {
+                return;
+            }
+
+            try {
+                loading();
+
+                await api('saveLicense', {
+                    id: license.id,
+                    ...result.value,
+                    total: Number(
+                        result.value.total
+                    ),
+                    used: Number(
+                        result.value.used
+                    )
+                });
+
+                await loadLicenses();
+                await loadDashboard();
+
+                ok('บันทึก License สำเร็จ');
+
+            } catch (error) {
+                fail(error);
+            }
+        }
+
+        /*
+         * Delete License
+         */
+        async function deleteLicense(license) {
+            const result = await Swal.fire({
+                title: 'ยืนยันการลบ?',
+                text: license.software,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'ลบ',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonColor: '#dc2626'
+            });
+
+            if (!result.isConfirmed) {
+                return;
+            }
+
+            try {
+                loading();
+
+                await api('deleteLicense', {
+                    id: license.id
+                });
+
+                await loadLicenses();
+                await loadDashboard();
+
+                ok('ลบ License สำเร็จ');
+
+            } catch (error) {
+                fail(error);
+            }
+        }
+
+        /*
+         * Users
+         */
+        async function loadUsers() {
+            const response =
+                await api('getUsers');
+
+            const users =
+                response.data || [];
+
+            const columns = [
+                {
+                    title: 'Username',
+                    field: 'username'
+                },
+                {
+                    title: 'Role',
+                    field: 'role'
+                },
+                {
+                    title: 'Active',
+                    field: 'active',
+                    formatter: cell =>
+                        cell.getValue()
+                            ? 'ใช้งาน'
+                            : 'ปิด'
+                },
+                {
+                    title: '',
+                    width: 150,
+                    headerSort: false,
+                    formatter: () => `
+                        <button class="edit-user text-blue-600 hover:underline">
+                            แก้ไข
+                        </button>
+
+                        <button class="delete-user ml-3 text-red-600 hover:underline">
+                            ลบ
+                        </button>
+                    `,
+                    cellClick: (event, cell) => {
+                        const row =
+                            cell.getRow().getData();
+
+                        if (
+                            event.target.classList.contains(
+                                'edit-user'
+                            )
+                        ) {
+                            openUser(row);
+                        }
+
+                        if (
+                            event.target.classList.contains(
+                                'delete-user'
+                            )
+                        ) {
+                            deleteUser(row);
+                        }
+                    }
+                }
+            ];
+
+            if (state.tables.users) {
+                state.tables.users.replaceData(users);
+                return;
+            }
+
+            state.tables.users =
+                new Tabulator('#userTable', {
+                    data: users,
+                    layout: 'fitColumns',
+                    responsiveLayout: 'collapse',
+                    placeholder: 'ไม่พบข้อมูลผู้ใช้',
+                    columns
+                });
+        }
+
+        /*
+         * Add/Edit User
+         */
+        async function openUser(user = {}) {
+            const result = await Swal.fire({
+                title: user.id
+                    ? 'แก้ไขผู้ใช้'
+                    : 'เพิ่มผู้ใช้',
+
+                html: formHtml([
+                    [
+                        'username',
+                        'Username',
+                        user.username,
+                        true
+                    ],
+                    [
+                        'password',
+                        user.id
+                            ? 'Password ใหม่ (เว้นว่างหากไม่เปลี่ยน)'
+                            : 'Password อย่างน้อย 8 ตัว',
+                        '',
+                        !user.id,
+                        'password'
+                    ],
+                    [
+                        'role',
+                        'Role',
+                        user.role || 'User',
+                        true,
+                        'role'
+                    ],
+                    [
+                        'active',
+                        'เปิดใช้งาน',
+                        user.active !== false,
+                        true,
+                        'checkbox'
+                    ]
+                ]),
+
+                showCancelButton: true,
+                confirmButtonText: 'บันทึก',
+                cancelButtonText: 'ยกเลิก',
+
+                preConfirm: () => collect([
+                    'username',
+                    'password',
+                    'role',
+                    'active'
+                ])
+            });
+
+            if (!result.value) {
+                return;
+            }
+
+            try {
+                loading();
+
+                await api('saveUser', {
+                    id: user.id,
+                    ...result.value
+                });
+
+                await loadUsers();
+
+                ok('บันทึกผู้ใช้สำเร็จ');
+
+            } catch (error) {
+                fail(error);
+            }
+        }
+
+        /*
+         * Delete User
+         */
+        async function deleteUser(user) {
+            const result = await Swal.fire({
+                title: 'ยืนยันการลบผู้ใช้?',
+                text: user.username,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'ลบ',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonColor: '#dc2626'
+            });
+
+            if (!result.isConfirmed) {
+                return;
+            }
+
+            try {
+                loading();
+
+                await api('deleteUser', {
+                    id: user.id
+                });
+
+                await loadUsers();
+
+                ok('ลบผู้ใช้สำเร็จ');
+
+            } catch (error) {
+                fail(error);
+            }
+        }
+
+        /*
+         * Audit Log
+         */
+        async function loadAudit() {
+            const response =
+                await api('getAuditLog', {
+                    limit: 200
+                });
+
+            const auditData =
+                response.data || [];
+
+            const columns = [
+                {
+                    title: 'เวลา',
+                    field: 'timestamp',
+                    minWidth: 180
+                },
+                {
+                    title: 'ผู้ใช้',
+                    field: 'username'
+                },
+                {
+                    title: 'Action',
+                    field: 'action'
+                },
+                {
+                    title: 'Entity',
+                    field: 'entity'
+                },
+                {
+                    title: 'ID',
+                    field: 'entityId'
+                },
+                {
+                    title: 'รายละเอียด',
+                    field: 'detail',
+                    minWidth: 200
+                }
+            ];
+
+            if (state.tables.audit) {
+                state.tables.audit.replaceData(
+                    auditData
+                );
+
+                return;
+            }
+
+            state.tables.audit =
+                new Tabulator('#auditTable', {
+                    data: auditData,
+                    layout: 'fitColumns',
+                    responsiveLayout: 'collapse',
+                    pagination: true,
+                    paginationSize: 20,
+                    placeholder: 'ไม่พบ Audit Log',
+                    columns
+                });
+        }
+
+        /*
+         * Change Password
+         */
+        async function openPassword() {
+            const result = await Swal.fire({
+                title: 'เปลี่ยนรหัสผ่าน',
+
+                html: formHtml([
+                    [
+                        'oldPassword',
+                        'รหัสผ่านเดิม',
+                        '',
+                        true,
+                        'password'
+                    ],
+                    [
+                        'newPassword',
+                        'รหัสผ่านใหม่อย่างน้อย 8 ตัว',
+                        '',
+                        true,
+                        'password'
+                    ]
+                ]),
+
+                showCancelButton: true,
+                confirmButtonText: 'เปลี่ยนรหัสผ่าน',
+                cancelButtonText: 'ยกเลิก',
+
+                preConfirm: () => collect([
+                    'oldPassword',
+                    'newPassword'
+                ])
+            });
+
+            if (!result.value) {
+                return;
+            }
+
+            try {
+                loading();
+
+                await api(
+                    'changePassword',
+                    result.value
+                );
+
+                ok('เปลี่ยนรหัสผ่านสำเร็จ');
+
+            } catch (error) {
+                fail(error);
+            }
+        }
+
+        /*
+         * Form Builder
+         */
+        function formHtml(fields) {
+            const html =
+                fields.map(field => {
+                    const [
+                        id,
+                        label,
+                        value,
+                        required,
+                        type = 'text'
+                    ] = field;
+
+                    if (type === 'status') {
+                        return `
+                            <label class="block text-left">
+                                <span>${label}</span>
+
+                                <select
+                                    id="f_${id}"
+                                    class="mt-1 w-full rounded border p-2">
+
+                                    <option
+                                        value="Active"
+                                        ${value === 'Active' ? 'selected' : ''}>
+                                        Active
+                                    </option>
+
+                                    <option
+                                        value="Inactive"
+                                        ${value === 'Inactive' ? 'selected' : ''}>
+                                        Inactive
+                                    </option>
+
+                                </select>
+                            </label>
+                        `;
+                    }
+
+                    if (type === 'role') {
+                        return `
+                            <label class="block text-left">
+                                <span>${label}</span>
+
+                                <select
+                                    id="f_${id}"
+                                    class="mt-1 w-full rounded border p-2">
+
+                                    <option
+                                        value="User"
+                                        ${value === 'User' ? 'selected' : ''}>
+                                        User
+                                    </option>
+
+                                    <option
+                                        value="Admin"
+                                        ${value === 'Admin' ? 'selected' : ''}>
+                                        Admin
+                                    </option>
+
+                                </select>
+                            </label>
+                        `;
+                    }
+
+                    if (type === 'checkbox') {
+                        return `
+                            <label class="flex items-center gap-2 text-left">
+                                <input
+                                    id="f_${id}"
+                                    type="checkbox"
+                                    ${value ? 'checked' : ''}>
+
+                                <span>${label}</span>
+                            </label>
+                        `;
+                    }
+
+                    return `
+                        <label class="block text-left">
+                            <span>${label}</span>
+
+                            <input
+                                id="f_${id}"
+                                type="${type}"
+                                value="${escapeHtml(value ?? '')}"
+                                ${required ? 'required' : ''}
+                                class="mt-1 w-full rounded border p-2">
+                        </label>
+                    `;
+                }).join('');
+
+            return `
+                <div class="space-y-3 text-left">
+                    ${html}
+                </div>
+            `;
+        }
+
+        /*
+         * Collect Form Values
+         */
+        function collect(ids) {
+            const data = {};
+
+            for (const id of ids) {
+                const element =
+                    document.getElementById(
+                        `f_${id}`
+                    );
+
+                if (!element) {
+                    continue;
+                }
+
+                if (element.type === 'checkbox') {
+                    data[id] = element.checked;
+                } else {
+                    data[id] = element.value.trim();
+                }
+
+                if (
+                    element.required &&
+                    !data[id]
+                ) {
+                    Swal.showValidationMessage(
+                        'กรุณากรอกข้อมูลให้ครบ'
+                    );
+
+                    return false;
+                }
+            }
+
+            return data;
+        }
+
+        /*
+         * Escape HTML
+         */
+        function escapeHtml(value) {
+            return String(value).replace(
+                /[&<>"]/g,
+                character => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;'
+                })[character]
+            );
+        }
+
+        /*
+         * Alerts
+         */
+        function loading(
+            title = 'กำลังดำเนินการ...'
+        ) {
+            Swal.fire({
+                title,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        }
+
+        function ok(message) {
+            Swal.fire(
+                'สำเร็จ',
+                message,
+                'success'
+            );
+        }
+
+        function fail(error) {
+            console.error(error);
+
+            Swal.fire(
+                'ข้อผิดพลาด',
+                error.message || String(error),
+                'error'
+            );
+        }
+
+        /*
+         * Start
+         */
         restore();
     </script>
 </body>
-
 </html>
-
-

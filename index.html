@@ -1,224 +1,161 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Software License Manager</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- jQuery (จำเป็นสำหรับ Select2) -->
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    
-    <!-- Select2 -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    
-    <!-- Tabulator -->
-    <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
-    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
-    
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Software License System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/tabulator-tables@6.2.5/dist/css/tabulator.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/tabulator-tables@6.2.5/dist/js/tabulator.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        .page-view { display: none; }
-        .active-view { display: block; }
+        .view {
+            display: none
+        }
+
+        .view.active {
+            display: block
+        }
+
+        .tabulator {
+            border: 0;
+            border-radius: .75rem
+        }
+
+        .nav-active {
+            background: #2563eb;
+            color: #fff
+        }
     </style>
 </head>
-<body class="bg-gray-100 font-sans antialiased text-gray-800">
 
-    <!-- ================= หน้า Login ================= -->
-    <div id="loginView" class="page-view active-view flex items-center justify-center min-h-screen">
-        <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-            <h2 class="text-2xl font-bold text-center text-blue-600 mb-6">License Manager</h2>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
-                <input type="text" id="loginUser" class="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-200 focus:outline-none" placeholder="admin">
+<body class="bg-slate-100 text-slate-800">
+    <section id="loginView"
+        class="view active min-h-screen grid place-items-center p-4 bg-gradient-to-br from-slate-950 to-blue-900">
+        <form id="loginForm" class="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl">
+            <div class="mb-7">
+                <h1 class="text-2xl font-bold">Software License System</h1>
+                <p class="text-slate-500">ระบบจัดการ Software License</p>
             </div>
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                <input type="password" id="loginPass" class="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-200 focus:outline-none" placeholder="1234">
+            <label class="block mb-4"><span class="text-sm font-medium">Username</span><input id="loginUser"
+                    autocomplete="username" required class="mt-1 w-full rounded-lg border p-3" value="admin"></label>
+            <label class="block mb-6"><span class="text-sm font-medium">Password</span><input id="loginPass"
+                    type="password" autocomplete="current-password" required class="mt-1 w-full rounded-lg border p-3"
+                    placeholder="••••••••"></label>
+            <button
+                class="w-full rounded-lg bg-blue-600 p-3 font-bold text-white hover:bg-blue-700">เข้าสู่ระบบ</button>
+        </form>
+    </section>
+
+    <section id="appView" class="view min-h-screen">
+        <header class="sticky top-0 z-20 bg-slate-950 text-white shadow">
+            <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
+                <div>
+                    <div class="font-bold">SLM System</div>
+                    <div id="profile" class="text-xs text-slate-300"></div>
+                </div>
+                <div class="flex gap-2"><button onclick="openPassword()"
+                        class="rounded-lg bg-slate-700 px-3 py-2 text-sm">เปลี่ยนรหัสผ่าน</button><button
+                        onclick="logout()" class="rounded-lg bg-red-600 px-3 py-2 text-sm">ออกจากระบบ</button></div>
             </div>
-            <button onclick="handleLogin()" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 transition">เข้าสู่ระบบ</button>
+        </header>
+        <div class="mx-auto max-w-7xl p-4">
+            <nav class="mb-5 flex gap-2 overflow-auto rounded-xl bg-white p-2 shadow-sm">
+                <button data-page="dashboard" class="nav-btn nav-active rounded-lg px-4 py-2">Dashboard</button>
+                <button data-page="licenses" class="nav-btn rounded-lg px-4 py-2">Licenses</button>
+                <button data-page="users" class="nav-btn admin-only rounded-lg px-4 py-2">Users</button>
+                <button data-page="audit" class="nav-btn admin-only rounded-lg px-4 py-2">Audit Log</button>
+            </nav>
+            <main>
+                <section id="dashboardPage" class="page">
+                    <div id="stats" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+                </section>
+                <section id="licensesPage" class="page hidden">
+                    <div
+                        class="mb-4 flex flex-col gap-3 rounded-xl bg-white p-4 shadow-sm sm:flex-row sm:justify-between">
+                        <input id="search" class="rounded-lg border px-4 py-2 sm:w-96"
+                            placeholder="ค้นหาซอฟต์แวร์, Key หรือ Vendor">
+                        <button onclick="openLicense()"
+                            class="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white">+ เพิ่ม License</button>
+                    </div>
+                    <div class="rounded-xl bg-white p-3 shadow-sm">
+                        <div id="licenseTable"></div>
+                    </div>
+                </section>
+                <section id="usersPage" class="page hidden">
+                    <div class="mb-4 flex justify-end"><button onclick="openUser()"
+                            class="rounded-lg bg-blue-600 px-4 py-2 text-white">+ เพิ่มผู้ใช้</button></div>
+                    <div class="rounded-xl bg-white p-3">
+                        <div id="userTable"></div>
+                    </div>
+                </section>
+                <section id="auditPage" class="page hidden">
+                    <div class="rounded-xl bg-white p-3">
+                        <div id="auditTable"></div>
+                    </div>
+                </section>
+            </main>
         </div>
-    </div>
+    </section>
 
-    <!-- ================= หน้า Dashboard หลัก ================= -->
-    <div id="mainView" class="page-view min-h-screen">
-        <!-- Navbar -->
-        <nav class="bg-slate-800 text-white shadow-md">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-16">
-                    <div class="flex items-center">
-                        <span class="font-bold text-xl tracking-wider">SLM System</span>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <span id="displayUser" class="text-sm bg-slate-700 px-3 py-1 rounded-full"></span>
-                        <button onclick="handleLogout()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm transition">ออกจากระบบ</button>
-                    </div>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Content -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="bg-white rounded-lg shadow-md p-6">
-                
-                <div class="flex justify-between items-center mb-6 border-b pb-4">
-                    <h3 class="text-xl font-bold text-gray-800">จัดการข้อมูล Software License</h3>
-                    <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition shadow">+ เพิ่มรายการใหม่</button>
-                </div>
-
-                <!-- ส่วนค้นหา (อินพุตและปุ่มอยู่คนละบรรทัด) -->
-                <div class="bg-gray-50 p-4 rounded-md border border-gray-200 mb-6">
-                    <h4 class="font-semibold text-gray-700 mb-3">ค้นหาข้อมูล</h4>
-                    
-                    <div class="block w-full mb-3">
-                        <input type="text" id="searchInput" class="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:outline-none" placeholder="พิมพ์ชื่อซอฟต์แวร์ หรือ License Key เพื่อค้นหา...">
-                    </div>
-                    
-                    <div class="block w-full">
-                        <button onclick="triggerSearch()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition shadow">
-                            <span class="flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                                ค้นหา
-                            </span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Dropdown โชว์ Select2 -->
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">ทดสอบระบบเบิกจ่าย (Select2):</label>
-                    <select id="softwareSelect" class="w-full md:w-1/2">
-                        <option value="">-- เลือกซอฟต์แวร์ --</option>
-                        <option value="1">Microsoft Office 365</option>
-                        <option value="2">Adobe Creative Cloud</option>
-                        <option value="3">AutoCAD 2024</option>
-                    </select>
-                </div>
-
-                <!-- พื้นที่แสดงตาราง Tabulator -->
-                <div id="licenseTable" class="w-full mt-4"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ================= Scripts ================= -->
     <script>
-        // 🛑 ใส่ Web App URL ที่ได้จาก Google Apps Script ที่นี่
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwi0Ri42a2GY35S_7CnhaFCKgOpk5dtWN9PK4lLHISvvxuCy0EhFq-QveX2uriSPdwo/exec";
-        
-        let table;
+        const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwi0Ri42a2GY35S_7CnhaFCKgOpk5dtWN9PK4lLHISvvxuCy0EhFq-QveX2uriSPdwo/exec';
+        const state = { token: localStorage.getItem('slm_token') || '', user: null, licenses: [], tables: {} };
 
-        // สลับหน้าจอ UI
-        function switchView(viewId) {
-            document.querySelectorAll('.page-view').forEach(el => el.classList.remove('active-view'));
-            document.getElementById(viewId).classList.add('active-view');
+        async function api(action, payload = {}) {
+            if (GAS_API_URL.startsWith('PUT_')) throw new Error('กรุณาตั้งค่า GAS_API_URL ใน index.html');
+            const response = await fetch(GAS_API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action, payload, token: state.token }), redirect: 'follow' });
+            const text = await response.text(); let result;
+            try { result = JSON.parse(text) } catch { throw new Error('Server ไม่ได้ส่ง JSON กลับมา') }
+            if (!result.success) { if (/เข้าสู่ระบบ|Session/.test(result.message)) { state.token = ''; localStorage.removeItem('slm_token') } throw new Error(result.message) }
+            return result;
         }
 
-        // ฟังก์ชันกลางสำหรับยิง API ผ่าน Fetch
-        async function fetchAPI(action, payload) {
-            const response = await fetch(GAS_API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: action, payload: payload })
-            });
-            return await response.json();
+        document.getElementById('loginForm').addEventListener('submit', async e => {
+            e.preventDefault(); loading('กำลังเข้าสู่ระบบ...'); try {
+                const r = await api('login', { username: loginUser.value.trim(), password: loginPass.value }); state.token = r.token; state.user = r.user; localStorage.setItem('slm_token', r.token); Swal.close(); startApp();
+            } catch (err) { fail(err) }
+        });
+
+        async function restore() { if (!state.token) return; try { const r = await api('getProfile'); state.user = r.user; startApp() } catch { localStorage.removeItem('slm_token') } }
+        function startApp() { loginView.classList.remove('active'); appView.classList.add('active'); profile.textContent = `${state.user.username} (${state.user.role})`; document.querySelectorAll('.admin-only').forEach(x => x.classList.toggle('hidden', state.user.role !== 'Admin')); showPage('dashboard') }
+        async function logout() { try { await api('logout') } catch { } state.token = ''; state.user = null; localStorage.removeItem('slm_token'); location.reload() }
+
+        document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => showPage(b.dataset.page));
+        async function showPage(name) {
+            document.querySelectorAll('.page').forEach(x => x.classList.add('hidden')); document.getElementById(name + 'Page').classList.remove('hidden'); document.querySelectorAll('.nav-btn').forEach(x => x.classList.toggle('nav-active', x.dataset.page === name));
+            try { if (name === 'dashboard') await loadDashboard(); if (name === 'licenses') await loadLicenses(); if (name === 'users') await loadUsers(); if (name === 'audit') await loadAudit() } catch (e) { fail(e) }
         }
 
-        // เข้าสู่ระบบ
-        async function handleLogin() {
-            const user = document.getElementById('loginUser').value;
-            const pass = document.getElementById('loginPass').value;
-
-            if (!user || !pass) return Swal.fire('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบถ้วน', 'warning');
-
-            Swal.fire({ title: 'กำลังตรวจสอบ...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
-
-            try {
-                const res = await fetchAPI('login', { username: user, password: pass });
-                
-                if (res.success) {
-                    Swal.close();
-                    document.getElementById('displayUser').innerText = `👩‍💻 ${res.user.username} (${res.user.role})`;
-                    switchView('mainView');
-                    
-                    // เรียกการทำงาน Libraries ต่างๆ
-                    initSelect2();
-                    loadTableData();
-                } else {
-                    Swal.fire('เกิดข้อผิดพลาด', res.message, 'error');
-                }
-            } catch (error) {
-                Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
-            }
+        async function loadDashboard() { const d = (await api('getDashboard')).data; const cards = [['License ทั้งหมด', d.total, 'blue'], ['ใช้งานอยู่', d.active, 'green'], ['ใกล้หมดอายุ ≤30 วัน', d.expiring, 'amber'], ['หมดอายุแล้ว', d.expired, 'red'], ['Seats ที่ซื้อ', d.totalSeats, 'violet'], ['Seats ที่ใช้', d.usedSeats, 'cyan']]; stats.innerHTML = cards.map(c => `<div class="rounded-xl bg-white p-5 shadow-sm border-l-4 border-${c[2]}-500"><div class="text-sm text-slate-500">${c[0]}</div><div class="mt-2 text-3xl font-bold">${c[1]}</div></div>`).join('') }
+        async function loadLicenses() {
+            const r = await api('getLicenses', { search: search.value }); state.licenses = r.data; const cols = [{ title: 'Software', field: 'software', minWidth: 170 }, { title: 'License Key', field: 'key', minWidth: 180 }, { title: 'Vendor', field: 'vendor' }, { title: 'Expiry', field: 'expiry' }, { title: 'Seats', formatter: c => `${c.getRow().getData().used}/${c.getRow().getData().total}` }, { title: 'Status', field: 'status' }, { title: '', width: 150, formatter: c => `<button class="edit text-blue-600 mr-3">แก้ไข</button>${state.user.role === 'Admin' ? '<button class="del text-red-600">ลบ</button>' : ''}`, cellClick: (e, c) => { if (e.target.classList.contains('edit')) openLicense(c.getRow().getData()); if (e.target.classList.contains('del')) deleteLicense(c.getRow().getData()) } }];
+            if (state.tables.licenses) state.tables.licenses.replaceData(r.data); else state.tables.licenses = new Tabulator('#licenseTable', { data: r.data, layout: 'fitColumns', responsiveLayout: 'collapse', pagination: true, paginationSize: 10, columns: cols })
         }
+        let searchTimer; search.addEventListener('input', () => { clearTimeout(searchTimer); searchTimer = setTimeout(loadLicenses, 300) });
 
-        function handleLogout() {
-            document.getElementById('loginUser').value = '';
-            document.getElementById('loginPass').value = '';
-            switchView('loginView');
+        async function openLicense(x = {}) {
+            const { value } = await Swal.fire({
+                title: x.id ? 'แก้ไข License' : 'เพิ่ม License', width: 700, html: formHtml([
+                    ['software', 'ชื่อ Software', x.software, true], ['key', 'License Key', x.key, true], ['vendor', 'Vendor', x.vendor, true], ['expiry', 'วันหมดอายุ', x.expiry, false, 'date'], ['total', 'จำนวน Seats ทั้งหมด', x.total ?? 0, true, 'number'], ['used', 'จำนวน Seats ที่ใช้', x.used ?? 0, true, 'number'], ['status', 'สถานะ', x.status || 'Active', true, 'select'], ['note', 'หมายเหตุ', x.note || '', false]
+                ]), showCancelButton: true, confirmButtonText: 'บันทึก', cancelButtonText: 'ยกเลิก', preConfirm: () => collect(['software', 'key', 'vendor', 'expiry', 'total', 'used', 'status', 'note'])
+            }); if (!value) return; try { loading(); await api('saveLicense', { id: x.id, ...value, total: Number(value.total), used: Number(value.used) }); await loadLicenses(); await loadDashboard(); ok('บันทึกสำเร็จ') } catch (e) { fail(e) }
         }
+        async function deleteLicense(x) { const r = await Swal.fire({ title: 'ยืนยันการลบ?', text: x.software, icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc2626' }); if (!r.isConfirmed) return; try { await api('deleteLicense', { id: x.id }); await loadLicenses(); ok('ลบสำเร็จ') } catch (e) { fail(e) } }
 
-        // เริ่มต้น Tabulator
-        async function loadTableData() {
-            // โหลดข้อมูลแบบจำลองหรือดึงจาก API
-            const res = await fetchAPI('getLicenses', {});
-            
-            // ข้อมูลจำลองกรณีที่ Sheet ยังว่างอยู่
-            const demoData = res.data.length > 0 ? res.data : [
-                { id: "L01", software: "Microsoft Office 365", key: "XXXX-XXXX-XXXX", vendor: "Microsoft", expiry: "31/12/2026", total: 50, used: 45 },
-                { id: "L02", software: "Adobe Creative Cloud", key: "YYYY-YYYY-YYYY", vendor: "Adobe", expiry: "15/10/2026", total: 10, used: 10 },
-            ];
+        async function loadUsers() { const data = (await api('getUsers')).data; const cols = [{ title: 'Username', field: 'username' }, { title: 'Role', field: 'role' }, { title: 'Active', field: 'active', formatter: c => c.getValue() ? 'ใช้งาน' : 'ปิด' }, { title: '', formatter: () => '<button class="edit text-blue-600 mr-3">แก้ไข</button><button class="del text-red-600">ลบ</button>', cellClick: (e, c) => { if (e.target.classList.contains('edit')) openUser(c.getRow().getData()); if (e.target.classList.contains('del')) deleteUser(c.getRow().getData()) } }]; if (state.tables.users) state.tables.users.replaceData(data); else state.tables.users = new Tabulator('#userTable', { data, layout: 'fitColumns', responsiveLayout: 'collapse', columns: cols }) }
+        async function openUser(x = {}) { const { value } = await Swal.fire({ title: x.id ? 'แก้ไขผู้ใช้' : 'เพิ่มผู้ใช้', html: formHtml([['username', 'Username', x.username, true], ['password', x.id ? 'Password ใหม่ (เว้นว่างหากไม่เปลี่ยน)' : 'Password อย่างน้อย 8 ตัว', '', !x.id, 'password'], ['role', 'Role', x.role || 'User', true, 'role'], ['active', 'เปิดใช้งาน', x.active !== false, true, 'checkbox']]), showCancelButton: true, preConfirm: () => collect(['username', 'password', 'role', 'active']) }); if (!value) return; try { await api('saveUser', { id: x.id, ...value, active: document.getElementById('f_active').checked }); await loadUsers(); ok('บันทึกสำเร็จ') } catch (e) { fail(e) } }
+        async function deleteUser(x) { const r = await Swal.fire({ title: 'ลบผู้ใช้นี้?', text: x.username, icon: 'warning', showCancelButton: true }); if (!r.isConfirmed) return; try { await api('deleteUser', { id: x.id }); await loadUsers(); ok('ลบสำเร็จ') } catch (e) { fail(e) } }
+        async function loadAudit() { const data = (await api('getAuditLog', { limit: 200 })).data; const cols = [{ title: 'เวลา', field: 'timestamp', minWidth: 180 }, { title: 'ผู้ใช้', field: 'username' }, { title: 'Action', field: 'action' }, { title: 'Entity', field: 'entity' }, { title: 'ID', field: 'entityId' }, { title: 'รายละเอียด', field: 'detail', minWidth: 200 }]; if (state.tables.audit) state.tables.audit.replaceData(data); else state.tables.audit = new Tabulator('#auditTable', { data, layout: 'fitColumns', responsiveLayout: 'collapse', pagination: true, paginationSize: 20, columns: cols }) }
+        async function openPassword() { const { value } = await Swal.fire({ title: 'เปลี่ยนรหัสผ่าน', html: formHtml([['oldPassword', 'รหัสผ่านเดิม', '', true, 'password'], ['newPassword', 'รหัสผ่านใหม่อย่างน้อย 8 ตัว', '', true, 'password']]), showCancelButton: true, preConfirm: () => collect(['oldPassword', 'newPassword']) }); if (!value) return; try { await api('changePassword', value); ok('เปลี่ยนรหัสผ่านสำเร็จ') } catch (e) { fail(e) } }
 
-            table = new Tabulator("#licenseTable", {
-                data: demoData,
-                layout: "fitColumns",
-                responsiveLayout: "collapse",
-                pagination: "local",
-                paginationSize: 10,
-                columns: [
-                    { title: "ID", field: "id", width: 80 },
-                    { title: "ชื่อซอฟต์แวร์", field: "software", minWidth: 150 },
-                    { title: "License Key", field: "key", minWidth: 150 },
-                    { title: "ผู้ผลิต", field: "vendor" },
-                    { title: "วันหมดอายุ", field: "expiry", hozAlign: "center" },
-                    { 
-                        title: "สถานะ (Used/Total)", 
-                        formatter: function(cell) {
-                            const row = cell.getRow().getData();
-                            const color = row.used >= row.total ? "text-red-600 font-bold" : "text-green-600";
-                            return `<span class="${color}">${row.used} / ${row.total}</span>`;
-                        },
-                        hozAlign: "center"
-                    }
-                ],
-            });
-        }
-
-        // ค้นหาข้อมูลในตาราง
-        function triggerSearch() {
-            const keyword = document.getElementById('searchInput').value;
-            if (table) {
-                table.setFilter([
-                    [
-                        {field: "software", type: "like", value: keyword},
-                        {field: "key", type: "like", value: keyword}
-                    ]
-                ]);
-            }
-        }
-
-        // เริ่มต้น Select2
-        function initSelect2() {
-            $('#softwareSelect').select2({
-                placeholder: "พิมพ์เพื่อค้นหาซอฟต์แวร์...",
-                allowClear: true
-            });
-        }
+        function formHtml(fields) { return `<div class="text-left space-y-3">${fields.map(([id, label, value, req, type = 'text']) => { if (type === 'select') return `<label class="block"><span>${label}</span><select id="f_${id}" class="mt-1 w-full rounded border p-2"><option ${value === 'Active' ? 'selected' : ''}>Active</option><option ${value === 'Inactive' ? 'selected' : ''}>Inactive</option></select></label>`; if (type === 'role') return `<label class="block"><span>${label}</span><select id="f_${id}" class="mt-1 w-full rounded border p-2"><option ${value === 'User' ? 'selected' : ''}>User</option><option ${value === 'Admin' ? 'selected' : ''}>Admin</option></select></label>`; if (type === 'checkbox') return `<label class="flex gap-2"><input id="f_${id}" type="checkbox" ${value ? 'checked' : ''}>${label}</label>`; return `<label class="block"><span>${label}</span><input id="f_${id}" type="${type}" value="${esc(value ?? '')}" ${req ? 'required' : ''} class="mt-1 w-full rounded border p-2"></label>` }).join('')}</div>` }
+        function collect(ids) { const o = {}; for (const id of ids) { const el = document.getElementById('f_' + id); if (!el) continue; o[id] = el.type === 'checkbox' ? el.checked : el.value.trim(); if (el.required && !o[id]) { Swal.showValidationMessage('กรุณากรอกข้อมูลให้ครบ'); return false } } return o }
+        function esc(v) { return String(v).replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m])) }
+        function loading(t = 'กำลังดำเนินการ...') { Swal.fire({ title: t, allowOutsideClick: false, didOpen: () => Swal.showLoading() }) } function ok(t) { Swal.fire('สำเร็จ', t, 'success') } function fail(e) { console.error(e); Swal.fire('ข้อผิดพลาด', e.message || String(e), 'error') }
+        restore();
     </script>
 </body>
+
 </html>
